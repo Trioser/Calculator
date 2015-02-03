@@ -25,11 +25,11 @@ class ViewController: UIViewController {
 	//
 	
 	var activeTyping : Bool = false
-	var operandStack = Array<Double>()
+	var calculatorBrain = CalculatorBrain()
 
 	@IBOutlet weak var display: UILabel!
 	
-	// Settable/Gettable property
+	// Settable/Gettable aka "Computed" property
 	var displayValue : Double {
 		set {
 			activeTyping = false
@@ -47,57 +47,14 @@ class ViewController: UIViewController {
 			enter()
 		}
 		
-		let operand = sender.currentTitle!
+		if let operatorString = sender.currentTitle {
+			if let result = calculatorBrain.performOperation(operatorString) {
+				displayValue = result
+			} else {
+				displayValue = 0
+			}
+		}
 		
-		switch operand {
-		case "×":
-			performOperation { $0 * $1 }
-		case "÷":
-			performOperation({ (leftValue: Double, rightValue: Double) -> Double in
-				return leftValue / rightValue
-			})
-		case "+":
-			performOperation { $0 + $1 }
-		case "-":
-			performOperation(subtract)
-		case "√":
-			performOperation { sqrt($0) }
-		default:
-			break
-		}
-	}
-	
-	func performOperation(operation: (Double, Double) -> Double) {
-		if (operandStack.count >= 2) {
-			var rightValue = operandStack.removeLast()
-			var leftValue = operandStack.removeLast()
-			displayValue = operation(leftValue, rightValue)
-			enter()
-		}
-	}
-	
-	func performOperation(operation: (Double) -> Double) {
-		if (operandStack.count >= 1) {
-			var leftValue = operandStack.removeLast()
-			displayValue = operation(leftValue)
-			enter()
-		}
-	}
-	
-	func divide(leftValue: Double, rightValue: Double) -> Double {
-		return leftValue / rightValue
-	}
-	
-	func subtract(leftValue: Double, rightValue: Double) -> Double {
-		return leftValue - rightValue
-	}
-	
-	func backwards(s1: String, s2: String) -> Bool {
-		return s1 > s2
-	}
-	
-	func forwards(s1: String, s2: String) -> Bool {
-		return s2 > s1
 	}
 	
 	func doSort(nameList: Array<String>, operation: (String, String) -> Bool) -> Array<String> {
@@ -145,8 +102,11 @@ class ViewController: UIViewController {
 	
 	@IBAction func enter() {
 		activeTyping = false
-		operandStack.append(displayValue)
-		println("\(operandStack)")
+		if let result = calculatorBrain.pushOperand(displayValue) {
+			displayValue  = result
+		} else {
+			displayValue = 0
+		}
 	}
 }
 

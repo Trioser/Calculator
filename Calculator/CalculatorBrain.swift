@@ -10,18 +10,34 @@ import Foundation
 
 class CalculatorBrain
 {
-	private enum Op {
+	private enum Op: Printable { // "Printable" is a protocol
 		case Operand(Double)
 		case UnaryOperation(String, Double -> Double)
 		case BinaryOperation(String, (Double, Double) -> Double)
 		
+		// "Computed" property
+		var description: String {
+			get {
+				switch self {
+				case .Operand(let operand):
+					return "\(operand)"
+				case .UnaryOperation(let unaryOperator, _):
+					return unaryOperator
+				case .BinaryOperation(let binaryOperator, _):
+					return binaryOperator
+				}
+			}
+		}
 	}
 	
 	private var opStack = [Op]() // Array<Op>
 	private var knownOps = [String:Op]() //Dictionary<String, Op>()
 	
 	init() {
-		knownOps["×"] = Op.BinaryOperation("×", *)
+		func learnOp(op:Op) {
+			knownOps[op.description] = op
+		}
+		learnOp(Op.BinaryOperation("×", *))
 		knownOps["÷"] = Op.BinaryOperation("÷", {$1 / $0})
 		knownOps["+"] = Op.BinaryOperation("+", +)
 		knownOps["-"] = Op.BinaryOperation("-", {$1 - $0})
@@ -56,14 +72,16 @@ class CalculatorBrain
 		return (nil, ops)
 	}
 	
-	func evalulate() -> Double? {
+	func evaluate() -> Double? {
 		//return evaluate(opStack).result
 		let (result, remainder) = evaluate(opStack)
+		println("\(opStack) = \(result) with \(remainder) left over.")
 		return result
 	}
 	
-	func pushOperand(operand: Double) {
+	func pushOperand(operand: Double) -> Double? {
 		opStack.append(Op.Operand(operand))
+		return evaluate()
 	}
 	
 	private func popOperand() -> Op {
@@ -73,9 +91,10 @@ class CalculatorBrain
 	}
 	
 	// push operation onto stack
-	func performOperation(symbol: String) {
+	func performOperation(symbol: String) -> Double? {
 		if let operation = knownOps[symbol] { // 'optional' boolean evaluation?
 			opStack.append(operation)
 		}
+		return evaluate()
 	}
 }
