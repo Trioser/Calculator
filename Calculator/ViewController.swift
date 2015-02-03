@@ -125,9 +125,9 @@ class ViewController: UIViewController {
 	@IBAction func arraySort() {
 		let names = ["Chris", "Alex", "Ewa", "Barry", "Daniella"]
 		println("Unsorted: \(names)")
-		let sortedNames = doSort(names, backwards)
+		let sortedNames = doSort(names, {return $0 > $1}) // equvalent of {(s1: String, s2: String) -> Bool in s2 > s1}
 		println("Sorted: \(sortedNames)")
-		let reverseSortedName = doSort(names, forwards)
+		let reverseSortedName = doSort(names, {return $1 > $0}) // {(s1: String, s2: String) -> Bool in s2 > s1})
 		println("Reverse sorted: \(reverseSortedName)")
 	}
 	
