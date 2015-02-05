@@ -79,6 +79,15 @@ class ViewController: UIViewController {
 		return result
 	}
 	
+	@IBAction func appendDecimalPoint(sender: UIButton) {
+		if (display.text!.rangeOfString(".") == nil) {
+			display.text = display.text! + "."
+		}
+	}
+	
+	//
+	// An example sort routine showing closure syntax
+	//
 	@IBAction func arraySort() {
 		let names = ["Chris", "Alex", "Ewa", "Barry", "Daniella"]
 		println("Unsorted: \(names)")
