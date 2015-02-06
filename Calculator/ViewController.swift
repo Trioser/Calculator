@@ -102,6 +102,14 @@ class ViewController: UIViewController {
 		println("Reverse sorted: \(reverseSortedName)")
 	}
 	
+	@IBAction func appendPi(sender: UIButton) {
+		if activeTyping {
+			enter()
+		}
+		display.text = "3.14159"
+		enter()
+	}
+	
 	@IBAction func appendDigit(sender: UIButton) {
 		let digit = sender.currentTitle!
 		println("digit = \(digit)")
