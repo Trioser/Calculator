@@ -80,8 +80,13 @@ class ViewController: UIViewController {
 	}
 	
 	@IBAction func appendDecimalPoint(sender: UIButton) {
-		if (display.text!.rangeOfString(".") == nil) {
-			display.text = display.text! + "."
+		if (activeTyping == true) {
+			if (display.text!.rangeOfString(".") == nil) {
+				display.text = display.text! + "."
+			}
+		} else {
+			display.text = "0."
+			activeTyping = true
 		}
 	}
 	
