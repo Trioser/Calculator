@@ -13,6 +13,8 @@ class ViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view, typically from a nib.
+		history.text = ""
+		display.text = "0.0"
 	}
 
 	override func didReceiveMemoryWarning() {
@@ -24,6 +26,7 @@ class ViewController: UIViewController {
 	// My changes
 	//
 	
+	let enterSymbol = "⏎"
 	var activeTyping : Bool = false
 	var calculatorBrain = CalculatorBrain()
 
@@ -46,7 +49,9 @@ class ViewController: UIViewController {
 	
 	@IBAction func operate(sender: UIButton) {
 		if activeTyping {
-			enter()
+			enter(sender.currentTitle)
+		} else {
+			history.text! += sender.currentTitle!
 		}
 		
 		if let operatorString = sender.currentTitle {
@@ -106,13 +111,20 @@ class ViewController: UIViewController {
 	
 	@IBAction func appendPi(sender: UIButton) {
 		if activeTyping {
-			enter()
+			enter(enterSymbol)
 		}
 		display.text = "3.14159"
-		enter()
+		enter(enterSymbol)
+	}
+	
+	@IBAction func clearEntry(sender: UIButton) {
+		displayValue = 0
 	}
 	
 	@IBAction func clear(sender: UIButton) {
+		displayValue = 0
+		history.text = ""
+		calculatorBrain.clear()
 	}
 	
 	@IBAction func appendDigit(sender: UIButton) {
@@ -127,7 +139,17 @@ class ViewController: UIViewController {
 		}
 	}
 	
-	@IBAction func enter() {
+	@IBAction func enter(sender: UIButton) {
+		enter(sender.currentTitle)
+	}
+	
+	private func enter(op: String?) {
+		history.text! += display.text!
+
+		if let historyOp = op {
+			history.text! += historyOp
+		}
+		
 		activeTyping = false
 		if let result = calculatorBrain.pushOperand(displayValue) {
 			displayValue  = result

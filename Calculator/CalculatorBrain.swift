@@ -47,6 +47,10 @@ class CalculatorBrain
 		learnOp(Op.UnaryOperation("cos", cos))
 	}
 	
+	func clear() {
+		opStack = [Op]()
+	}
+	
 	private func evaluate(ops: [Op]) -> (result: Double?, remainingStack: [Op]) {
 		if !ops.isEmpty {
 			var remainingStack = ops
