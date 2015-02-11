@@ -29,6 +29,8 @@ class ViewController: UIViewController {
 
 	@IBOutlet weak var display: UILabel!
 	
+	@IBOutlet weak var history: UILabel!
+	
 	// Settable/Gettable aka "Computed" property
 	var displayValue : Double {
 		set {
@@ -108,6 +110,9 @@ class ViewController: UIViewController {
 		}
 		display.text = "3.14159"
 		enter()
+	}
+	
+	@IBAction func clear(sender: UIButton) {
 	}
 	
 	@IBAction func appendDigit(sender: UIButton) {
