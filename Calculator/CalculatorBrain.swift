@@ -8,12 +8,15 @@
 
 import Foundation
 
+let piSymbol = "π"
+
 class CalculatorBrain
 {
 	private enum Op: Printable { // "Printable" is a protocol
 		case Operand(Double)
 		case UnaryOperation(String, Double -> Double)
 		case BinaryOperation(String, (Double, Double) -> Double)
+		case Constant(String, Double)
 		
 		// "Computed" property
 		var description: String {
@@ -25,6 +28,8 @@ class CalculatorBrain
 					return unaryOperator
 				case .BinaryOperation(let binaryOperator, _):
 					return binaryOperator
+				case .Constant(let symbol, _):
+					return symbol
 				}
 			}
 		}
@@ -45,6 +50,9 @@ class CalculatorBrain
 		learnOp(Op.UnaryOperation("√", sqrt))
 		learnOp(Op.UnaryOperation("sin", sin))
 		learnOp(Op.UnaryOperation("cos", cos))
+		learnOp(Op.Constant("π", M_PI))
+		
+		println(knownOps.description)
 	}
 	
 	func clear() {
@@ -72,6 +80,8 @@ class CalculatorBrain
 						return (operation(operand1, operand2), operand2Eval.remainingStack)
 					}
 				}
+			case .Constant(_, let value):
+				return(value, remainingStack)
 			}
 		}
 		
@@ -85,8 +95,17 @@ class CalculatorBrain
 		return result
 	}
 	
-	func pushOperand(operand: Double) -> Double? {
-		opStack.append(Op.Operand(operand))
+	func pushOperand(operand: Double?) -> Double? {
+		if let operand = operand {
+			opStack.append(Op.Operand(operand))
+		}
+		
+		return evaluate()
+	}
+	
+	func pushOperand(symbol: String) -> Double? {
+		let op = knownOps[symbol]
+		opStack.append(op!)
 		return evaluate()
 	}
 	

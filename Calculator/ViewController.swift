@@ -35,15 +35,13 @@ class ViewController: UIViewController {
 	@IBOutlet weak var history: UILabel!
 	
 	// Settable/Gettable aka "Computed" property
-	var displayValue : Double {
+	private var displayValue : Double? {
 		set {
 			activeTyping = false
-			display.text = "\(newValue)"
+			display.text = "\(newValue!)"
 		}
 		get {
-			var result : Double = 0
-			result = NSNumberFormatter().numberFromString(display.text!)!.doubleValue
-			return result
+			return NSNumberFormatter().numberFromString(display.text!)?.doubleValue
 		}
 	}
 	
@@ -57,8 +55,6 @@ class ViewController: UIViewController {
 		if let operatorString = sender.currentTitle {
 			if let result = calculatorBrain.performOperation(operatorString) {
 				displayValue = result
-			} else {
-				displayValue = 0
 			}
 		}
 		
@@ -113,7 +109,7 @@ class ViewController: UIViewController {
 		if activeTyping {
 			enter(enterSymbol)
 		}
-		display.text = "3.14159"
+		display.text = piSymbol
 		enter(enterSymbol)
 	}
 	
@@ -151,10 +147,11 @@ class ViewController: UIViewController {
 		}
 		
 		activeTyping = false
-		if let result = calculatorBrain.pushOperand(displayValue) {
-			displayValue  = result
+		
+		if let operand = displayValue {
+			displayValue = calculatorBrain.pushOperand(displayValue)
 		} else {
-			displayValue = 0
+			displayValue = calculatorBrain.pushOperand(display.text!)
 		}
 	}
 }
