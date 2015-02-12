@@ -17,6 +17,7 @@ class CalculatorBrain
 		case UnaryOperation(String, Double -> Double)
 		case BinaryOperation(String, (Double, Double) -> Double)
 		case Constant(String, Double)
+		case Variable(String, String -> Double?)
 		
 		// "Computed" property
 		var description: String {
@@ -30,6 +31,8 @@ class CalculatorBrain
 					return binaryOperator
 				case .Constant(let symbol, _):
 					return symbol
+				case .Variable(let symbol, _):
+					return symbol
 				}
 			}
 		}
@@ -37,6 +40,7 @@ class CalculatorBrain
 	
 	private var opStack = [Op]() // Array<Op>
 	private var knownOps = [String:Op]() //Dictionary<String, Op>()
+	private var variables = [String:Double]()
 	
 	init() {
 		func learnOp(op:Op) {
@@ -51,12 +55,22 @@ class CalculatorBrain
 		learnOp(Op.UnaryOperation("sin", sin))
 		learnOp(Op.UnaryOperation("cos", cos))
 		learnOp(Op.Constant("π", M_PI))
+		learnOp(Op.Variable("M", {self.variables[$0]}))
 		
 		println(knownOps.description)
 	}
 	
 	func clear() {
 		opStack = [Op]()
+		variables = [String:Double]()
+	}
+	
+	func setMemoryVariable(key: String, value: Double) {
+		variables[key] = value
+	}
+	
+	func getMemoryVariable(key: String) -> Double? {
+		return variables[key]
 	}
 	
 	private func evaluate(ops: [Op]) -> (result: Double?, remainingStack: [Op]) {
@@ -82,6 +96,9 @@ class CalculatorBrain
 				}
 			case .Constant(_, let value):
 				return(value, remainingStack)
+			case .Variable(let key, let lookup):
+				let operand = lookup(key)
+				return(operand, remainingStack)
 			}
 		}
 		

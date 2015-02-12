@@ -27,6 +27,7 @@ class ViewController: UIViewController {
 	//
 	
 	let enterSymbol = "⏎"
+	let memoryKey = "M"
 	var activeTyping : Bool = false
 	var calculatorBrain = CalculatorBrain()
 
@@ -38,12 +39,35 @@ class ViewController: UIViewController {
 	private var displayValue : Double? {
 		set {
 			activeTyping = false
-			display.text = "\(newValue!)"
+			if newValue == nil {
+				display.text = " "
+			} else {
+				display.text = "\(newValue!)"
+			}
 		}
 		get {
 			return NSNumberFormatter().numberFromString(display.text!)?.doubleValue
 		}
 	}
+	
+	@IBAction func memorySet(sender: UIButton) {
+		if let currentDisplayValue = displayValue {
+			activeTyping = false
+			calculatorBrain.setMemoryVariable(memoryKey, value: currentDisplayValue)
+			displayValue = calculatorBrain.evaluate()
+		} else {
+			println("Current display value is not valid for memory set key.")
+		}
+	}
+	
+	@IBAction func memoryGet(sender: UIButton) {
+		if activeTyping {
+			enter(enterSymbol)
+		}
+		display.text = memoryKey
+		enter(enterSymbol)
+	}
+	
 	
 	@IBAction func operate(sender: UIButton) {
 		if activeTyping {
