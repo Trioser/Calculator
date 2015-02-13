@@ -72,8 +72,6 @@ class ViewController: UIViewController {
 	@IBAction func operate(sender: UIButton) {
 		if activeTyping {
 			enter(sender.currentTitle)
-		} else {
-			history.text! += sender.currentTitle!
 		}
 		
 		if let operatorString = sender.currentTitle {
@@ -81,7 +79,7 @@ class ViewController: UIViewController {
 				displayValue = result
 			}
 		}
-		
+		history.text! = calculatorBrain.description
 	}
 	
 	func doSort(nameList: Array<String>, operation: (String, String) -> Bool) -> Array<String> {
@@ -164,11 +162,11 @@ class ViewController: UIViewController {
 	}
 	
 	private func enter(op: String?) {
-		history.text! += display.text!
-
-		if let historyOp = op {
-			history.text! += historyOp
-		}
+//		history.text! += display.text!
+//
+//		if let historyOp = op {
+//			history.text! += historyOp
+//		}
 		
 		activeTyping = false
 		
@@ -177,6 +175,8 @@ class ViewController: UIViewController {
 		} else {
 			displayValue = calculatorBrain.pushOperand(display.text!)
 		}
+		
+		history.text! = calculatorBrain.description
 	}
 }
 
