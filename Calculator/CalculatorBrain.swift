@@ -12,6 +12,10 @@ let piSymbol = "π"
 
 class CalculatorBrain
 {
+	private var opStack = [Op]() // Array<Op>
+	private var knownOps = [String:Op]() //Dictionary<String, Op>()
+	private var variables: [String:Double?] = ["M":nil]
+
 	private enum Op: Printable { // "Printable" is a protocol
 		case Operand(Double)
 		case UnaryOperation(String, Double -> Double)
@@ -48,20 +52,17 @@ class CalculatorBrain
 					return binaryOperator
 				case .Constant(let symbol, _):
 					return symbol
-				case .Variable(let symbol, _):
+				case .Variable(let symbol, let getValue):
 					return symbol
 				}
 			}
 		}
 	}
 	
-	private var opStack = [Op]() // Array<Op>
-	private var knownOps = [String:Op]() //Dictionary<String, Op>()
-	private var variables = [String:Double]()
-	
 	init() {
 		func learnOp(op:Op) {
 			knownOps[op.description] = op
+			println("\(knownOps)")
 		}
 
 		learnOp(Op.BinaryOperation("×", *, precedence: 1))
@@ -72,7 +73,7 @@ class CalculatorBrain
 		learnOp(Op.UnaryOperation("sin", sin))
 		learnOp(Op.UnaryOperation("cos", cos))
 		learnOp(Op.Constant("π", M_PI))
-		learnOp(Op.Variable("M", {self.variables[$0]}))
+		learnOp(Op.Variable("M", getMemoryVariable)) // aka {self.variables[$0]!}
 		
 		println(knownOps.description)
 	}
@@ -114,27 +115,39 @@ class CalculatorBrain
 			}
 		}
 
-		return ("", -1, ops)
+		return ("?", Int.max, ops)
 	}
 
 	var description: String {
 		get {
+			var descriptionStack = Stack<String>()
 			var tempStack = opStack
-			var result = ""
+			
 			while !tempStack.isEmpty {
 				let tuple = describe(tempStack)
-				result += tuple.description + ","
+				descriptionStack.push(tuple.description)
 				tempStack = tuple.remainingStack
 			}
 			
+			var result = ""
+			var expressionOnStack = 0
+			while !descriptionStack.isEmpty() {
+				let description = descriptionStack.pop()
+				result += description + ","
+				expressionOnStack++
+			}
+			
 			result = result[result.startIndex..<result.endIndex.predecessor()]
+			if expressionOnStack == 1 {
+				result += "="
+			}
 			return result
 		}
 	}
 	
 	func clear() {
 		opStack = [Op]()
-		variables = [String:Double]()
+		variables = ["M":nil]
 	}
 	
 	func setMemoryVariable(key: String, value: Double) {
@@ -142,7 +155,7 @@ class CalculatorBrain
 	}
 	
 	func getMemoryVariable(key: String) -> Double? {
-		return variables[key]
+		return variables[key]!
 	}
 	
 	private func evaluate(ops: [Op]) -> (result: Double?, remainingStack: [Op]) {

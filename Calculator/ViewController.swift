@@ -77,6 +77,8 @@ class ViewController: UIViewController {
 		if let operatorString = sender.currentTitle {
 			if let result = calculatorBrain.performOperation(operatorString) {
 				displayValue = result
+			} else {
+				displayValue = nil
 			}
 		}
 		history.text! = calculatorBrain.description
